@@ -22,26 +22,27 @@ class Servidor():
 			msg = input('\n << SALIR = 1 >> \n')
 			if msg == '1':
 				print(" **** Me piro vampiro; cierro socket y mato SERVER con PID = ", os.getpid())
-                
+				with open("nicknameList.txt", "w") as f:
+					f.write(" ")
 				self.s.close()
 				sys.exit()
 			else: pass
 
-	def aceptarC(self):
+	def aceptarC(self):  #función para entrar al chat
 		print('\nHilo ACEPTAR con ID =',threading.currentThread().getName(), '\n\tHilo en modo DAEMON = ', threading.currentThread().isDaemon(),'\n\tPertenece al PROCESO con PID', os.getpid(), "\n\tHilos activos TOTALES ", threading.active_count())
 		
 		while True:
 			try:
 				conn, addr = self.s.accept()
 				print(f"\nConexion aceptada via {addr}\n")
-				conn.setblocking(False)
-				self.clientes.append(conn)
+				conn.setblocking(False)      #hacemos que no se bloquee 
+				self.clientes.append(conn)   #añadimos al array cliente
 				self.readNick
 			except: pass
         
 	def readNick(self):
 		with open("nicknameList.txt", "r") as f:
-			print("Clientes conectados actualmente {\n" + f.read() + "--------------------------")
+			print("Clientes conectados actualmente \n--------------------------" + f.read() + "--------------------------")   #leemos el archivo de los nombre para mostrar los usuarios actuales
 
 	def procesarC(self):
 		print('\nHilo PROCESAR con ID =',threading.currentThread().getName(), '\n\tHilo en modo DAEMON = ', threading.currentThread().isDaemon(),'\n\tPertenece al PROCESO con PID', os.getpid(), "\n\tHilos activos TOTALES ", threading.active_count())
@@ -49,8 +50,8 @@ class Servidor():
 			if len(self.clientes) > 0:
 				for c in self.clientes:
 					try:
-						data = c.recv(128)
-						if data: self.broadcast(data,c)
+						data = c.recv(128)        #recibimos y guardamos c
+						if data: self.broadcast(data,c)  #cuando data es verdadero se abre el broadcast
 					except: pass
 
 	def broadcast(self, msg, cliente):
